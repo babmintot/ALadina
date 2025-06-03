@@ -1,0 +1,56 @@
+import os
+import stat
+
+# Функция для вывода информации о файловой системе
+def show_fs_info(path="."):
+    print(f"\nИнформация о файловой системе для пути '{path}':")
+    try:
+        st = os.statvfs(path)
+        print(f"Размер блока в файловой системе: {st.f_bsize} байт")
+        print(f"Общее количество блоков: {st.f_blocks}")
+        print(f"Количество свободных блоков: {st.f_bfree}")
+        print(f"Количество доступных блоков для пользователя: {st.f_bavail}")
+        print(f"Количество inode: {st.f_files}")
+        print(f"Количество свободных inode: {st.f_ffree}")
+        print(f"Максимальная длина имени файла: {st.f_namemax}")
+    except Exception as e:
+        print("Ошибка при получении информации о файловой системе:", str(e))
+
+
+# Функция для вывода информации о файле
+def show_file_info(filepath):
+    print(f"\nИнформация о файле '{filepath}':")
+    try:
+        st = os.stat(filepath)
+
+        print(f"Inode: {st.st_ino}")
+        if stat.S_ISDIR(st.st_mode):
+            print("Тип: директория")
+        elif stat.S_ISREG(st.st_mode):
+            print("Тип: обычный файл")
+        elif stat.S_ISLNK(st.st_mode):
+            print("Тип: символическая ссылка")
+        else:
+            print("Тип: другой тип файла")
+
+        print(f"Права доступа: {oct(st.st_mode & 0o777)}")
+        print(f"Размер: {st.st_size} байт")
+        print(f"Последнее изменение: {st.st_mtime}")
+
+    except Exception as e:
+        print("Ошибка при получении информации о файле:", str(e))
+
+
+# Основная часть программы
+if __name__ == "__main__":
+    # Информация о файловой системе для корня и текущей папки
+    show_fs_info("/")
+    show_fs_info(".")
+
+    # Создание тестового файла
+    test_file = "testfile.txt"
+    with open(test_file, "w") as f:
+        f.write("Тестовый файл для получения информации.\n")
+
+    # Получение информации о созданном файле
+    show_file_info(test_file)
